@@ -4,12 +4,18 @@ import { cn } from "@/lib/utils";
 import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, BookOpen, Plus, ChevronDown } from "lucide-react";
+import { Calendar, BookOpen, Plus, ChevronDown, Sparkles, Pencil } from "lucide-react";
 import { PopulatedSermon, SermonSeries } from "@/types/sermon"; // Import types
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"; // Import router type
 
 // Remove local interface definitions
 // interface SermonSeries { ... }
 // interface PopulatedSermon { ... }
+
+// Helper to check if series is fully populated or just an ID (though API returns populated)
+function isSermonSeriesPopulated(series: SermonSeries | string | undefined): series is SermonSeries {
+  return typeof series === 'object' && series !== null && '_id' in series && 'name' in series;
+}
 
 interface JourneyListProps {
     sermons: PopulatedSermon[]; // Use imported type
@@ -17,59 +23,100 @@ interface JourneyListProps {
     toggleExpandSermon: (id: string) => void;
     getSeriesColorClasses: (colorName?: string) => { bg: string; border: string; text: string };
     setNewMessageOpen: (open: boolean) => void;
+    router: AppRouterInstance; // Add router prop
 }
 
-// Helper to check if series is fully populated or just an ID (though API returns populated)
-function isSermonSeriesPopulated(series: SermonSeries | string | undefined): series is SermonSeries {
-  return typeof series === 'object' && series !== null && '_id' in series && 'name' in series;
-}
+// Animation variants
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { 
+            staggerChildren: 0.08,
+            delayChildren: 0.1
+        }
+    }
+};
+
+const listItemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+        opacity: 1, 
+        y: 0,
+        transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+    }
+};
 
 export function JourneyList({
     sermons,
     expandedSermon,
     toggleExpandSermon,
     getSeriesColorClasses,
-    setNewMessageOpen
+    setNewMessageOpen,
+    router // Destructure router prop
 }: JourneyListProps) {
     return (
         <div>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-8 flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-medium tracking-tight text-foreground">
+                    <h2 className="text-2xl font-serif font-medium tracking-tight text-foreground">
                         Your Sermon Journey
                     </h2>
-                    <p className="mt-1 text-muted-foreground">
+                    <p className="mt-1 text-muted-foreground font-light tracking-wide">
                         Cultivating ideas into messages that transform
                     </p>
                 </div>
-                <Button onClick={() => setNewMessageOpen(true)} className="rounded-full bg-[#e8e3d9] text-[#3c3528] hover:bg-[#dfd8ca] dark:bg-[#2a2520] dark:text-[#e8e3d9] dark:hover:bg-[#373029]">
-                    <Plus className="mr-1 h-4 w-4" />
-                    New Sermon
-                </Button>
+                <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                >
+                    <Button 
+                        onClick={() => setNewMessageOpen(true)} 
+                        className="rounded-full bg-gradient-to-r from-accent-3/50 to-accent-3/30 text-accent-1/90 hover:bg-gradient-to-r hover:from-accent-3/60 hover:to-accent-3/40 dark:from-accent-3/40 dark:to-accent-3/20 dark:text-accent-1/90 border border-accent-3/40 shadow-sm hover:shadow-md transition-all duration-300"
+                    >
+                        <Sparkles className="mr-1 h-4 w-4" />
+                        New Sermon
+                    </Button>
+                </motion.div>
             </div>
 
-            <div className="space-y-4">
+            <motion.div 
+                className="space-y-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
                 {sermons.length === 0 ? (
-                    <p className="text-center text-muted-foreground mt-8">
-                        No sermons planned yet. Click "New Sermon" to start.
-                    </p>
+                    <motion.div 
+                        className="text-center py-12 px-6"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                    >
+                        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent-3/30 to-accent-3/10 mb-4">
+                            <BookOpen className="h-5 w-5 text-accent-1" />
+                        </div>
+                        <p className="text-muted-foreground mt-2 font-light">
+                            No sermons planned yet. Click "New Sermon" to start your journey.
+                        </p>
+                    </motion.div>
                 ) : (
                     sermons.map((sermon, index) => {
-                        // Check if series is populated before accessing its properties
-                        const isSeriesPopulated = isSermonSeriesPopulated(sermon.series);
-                        const seriesColors = getSeriesColorClasses(isSeriesPopulated ? sermon.series.color : undefined);
+                        // Check if series exists and is an object (not a string)
+                        const seriesObject = sermon.series && typeof sermon.series === 'object' ? sermon.series : null;
+                        const seriesColors = getSeriesColorClasses(seriesObject?.color);
 
                         return (
                             <motion.div
                                 key={sermon._id}
                                 layout
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.03 }}
+                                variants={listItemVariants}
                                 className={cn(
-                                    "rounded-lg border bg-card text-card-foreground overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md",
-                                    sermon.borderColor || "border-border",
-                                    expandedSermon === sermon._id && "shadow-lg ring-1 ring-primary/20"
+                                    "rounded-lg border backdrop-blur-sm overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md",
+                                    expandedSermon === sermon._id 
+                                        ? "bg-gradient-to-br from-card/80 to-card/60 shadow-lg ring-1 ring-primary/20" 
+                                        : "bg-card",
+                                    sermon.borderColor || "border-border hover:border-accent-3/30"
                                 )}
                             >
                                 <CardHeader
@@ -79,7 +126,8 @@ export function JourneyList({
                                     onClick={() => toggleExpandSermon(sermon._id)}
                                 >
                                     <div className="flex-1 space-y-1.5 min-w-0">
-                                        {isSeriesPopulated && (
+                                        {/* Only render badge if series is an object with name property */}
+                                        {seriesObject && 'name' in seriesObject && (
                                             <Badge
                                                 variant="outline"
                                                 className={cn(
@@ -89,13 +137,11 @@ export function JourneyList({
                                                     seriesColors.text
                                                 )}
                                             >
-                                                {sermon.series.name} {/* Safe to access name */}
+                                                {seriesObject.name}
                                             </Badge>
                                         )}
-                                        {/* Handle case where series is just an ID string, though unlikely with current fetch logic */}
-                                        {/* {typeof sermon.series === 'string' && <Badge>Series ID: {sermon.series}</Badge>} */}
 
-                                        <CardTitle className="text-md font-semibold leading-tight pt-0.5 truncate" title={sermon.title}>
+                                        <CardTitle className="text-md font-serif font-semibold leading-tight pt-0.5 truncate" title={sermon.title}>
                                             {sermon.title}
                                         </CardTitle>
                                         <div className="text-xs text-muted-foreground flex items-center flex-wrap gap-x-2 gap-y-1 pt-1">
@@ -105,7 +151,7 @@ export function JourneyList({
                                                     <span>{new Date(sermon.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                                 </div>
                                             )}
-                                            {sermon.date && sermon.scripture && <span className="hidden sm:inline">&bull;</span>}
+                                            {sermon.date && sermon.scripture && <span className="hidden sm:inline text-accent-1/30">&bull;</span>}
                                             {sermon.scripture && (
                                                 <div className="flex items-center gap-1">
                                                     <BookOpen className="h-3 w-3" />
@@ -114,12 +160,32 @@ export function JourneyList({
                                             )}
                                         </div>
                                     </div>
-                                    <ChevronDown
-                                        className={cn(
-                                            "h-5 w-5 text-muted-foreground transition-transform flex-shrink-0 mt-0.5",
-                                            expandedSermon === sermon._id && "rotate-180"
-                                        )}
-                                    />
+                                    {/* Controls Area: Edit Button and Expand Chevron */}
+                                    <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
+                                        {/* Edit Button Navigates to Edit Page */}
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-7 w-7 rounded-full hover:bg-accent-3/10"
+                                            onClick={(e) => { 
+                                                e.stopPropagation(); 
+                                                // Navigate to the edit page for this sermon
+                                                router.push(`/sermon-journey/${sermon._id}/edit`); 
+                                            }}
+                                        >
+                                            <Pencil className="h-4 w-4 text-muted-foreground hover:text-accent-1" />
+                                        </Button>
+                                        <motion.div
+                                            animate={{ 
+                                                rotate: expandedSermon === sermon._id ? 180 : 0 
+                                            }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                        >
+                                            <ChevronDown
+                                                className="h-5 w-5 text-muted-foreground"
+                                            />
+                                        </motion.div>
+                                    </div>
                                 </CardHeader>
 
                                 <AnimatePresence>
@@ -128,12 +194,14 @@ export function JourneyList({
                                             initial={{ height: 0, opacity: 0 }}
                                             animate={{ height: "auto", opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
-                                            transition={{ duration: 0.2 }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
                                             className="overflow-hidden"
                                         >
-                                            <CardContent className="p-4 pt-2 border-t">
-                                                <h4 className="text-sm font-medium mb-1.5">Notes</h4>
-                                                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{sermon.notes || 'No notes yet.'}</p>
+                                            <CardContent className="p-5 pt-2 border-t bg-gradient-to-br from-background/50 to-background/30">
+                                                <h4 className="text-sm font-medium mb-2 font-serif text-foreground/90">Notes</h4>
+                                                <p className="text-sm text-muted-foreground whitespace-pre-wrap font-light leading-relaxed">
+                                                    {sermon.notes || 'No notes yet. Add your sermon thoughts here.'}
+                                                </p>
                                             </CardContent>
                                         </motion.div>
                                     )}
@@ -142,7 +210,7 @@ export function JourneyList({
                         )
                     })
                 )}
-            </div>
+            </motion.div>
         </div>
     );
 } 

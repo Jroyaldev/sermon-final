@@ -10,13 +10,23 @@ export interface SermonSeries {
   archivedAt?: string | Date | null; // ISO string, Date object, or null if not archived
 }
 
+// Define section types for better organization
+export interface SermonSection {
+  id: string;
+  type: 'introduction' | 'mainPoint' | 'illustration' | 'application' | 'conclusion' | 'custom';
+  title: string;
+  content: string;
+  order: number;
+  customType?: string; // Used when type is 'custom'
+}
+
 // Defines a Sermon, potentially populated with its series information
 export interface PopulatedSermon {
   _id: string;
   userId: string; // ID of the user who created the sermon
   title: string;
-  // Series can be the full object when populated, or just the ID string, or undefined
-  series?: SermonSeries | string; 
+  // Series should be the full object when populated for list/display views
+  series?: SermonSeries;
   date?: string | Date; // ISO string or Date object
   scripture?: string; // e.g., "John 3:16-17"
   notes?: string; // General notes or outline
@@ -26,7 +36,8 @@ export interface PopulatedSermon {
   color?: string; 
   borderColor?: string;
   textColor?: string;
-  // Sermon content details
+  // Sermon content details using structured sections
+  sections?: SermonSection[]; // Organized sections of the sermon
   keyPoints?: string[];
   scriptureText?: string; // Full text of the scripture passage
   illustrations?: string[]; // Anecdotes, stories

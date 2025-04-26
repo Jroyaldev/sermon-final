@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { JourneyList } from "./JourneyList";
 import { SeriesList } from "./SeriesList";
 import { PopulatedSermon, SermonSeries } from "@/types/sermon"; // Import types
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"; // Import router type
 
 // Remove local interface definitions
 // interface SermonSeries { ... }
@@ -17,6 +18,7 @@ interface JourneyTabsProps {
     handleToggleSeriesArchive: (seriesId: string, currentActiveState: boolean) => void;
     getSeriesColorClasses: (colorName?: string) => { bg: string; border: string; text: string };
     setNewMessageOpen: (open: boolean) => void;
+    router: AppRouterInstance; // Add router prop type
 }
 
 export function JourneyTabs({
@@ -28,7 +30,8 @@ export function JourneyTabs({
     toggleExpandSermon,
     handleToggleSeriesArchive,
     getSeriesColorClasses,
-    setNewMessageOpen
+    setNewMessageOpen,
+    router // Destructure router prop
 }: JourneyTabsProps) {
 
     // Determine which tab is currently selected for the Tabs component
@@ -63,6 +66,7 @@ export function JourneyTabs({
                     toggleExpandSermon={toggleExpandSermon}
                     getSeriesColorClasses={getSeriesColorClasses}
                     setNewMessageOpen={setNewMessageOpen}
+                    router={router} // Pass router down to JourneyList
                 />
             </TabsContent>
 

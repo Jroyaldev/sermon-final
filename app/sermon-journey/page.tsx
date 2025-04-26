@@ -43,7 +43,7 @@ import { useRouter } from "next/navigation"
 import { SidebarNav } from "@/components/sermon-journey/SidebarNav";
 import { JourneyHeader } from "@/components/sermon-journey/JourneyHeader";
 import { JourneyTabs } from "@/components/sermon-journey/JourneyTabs";
-import { RightSidebar } from "@/components/sermon-journey/RightSidebar";
+// import { RightSidebar } from "@/components/sermon-journey/RightSidebar"; // Removed import
 import { NewSermonDialog } from "@/components/sermon-journey/NewSermonDialog";
 
 // Assuming Sermon interface matches the one in api/sermons/route.ts
@@ -372,6 +372,7 @@ export default function SermonJourney() {
                     handleToggleSeriesArchive={handleToggleSeriesArchive}
                     getSeriesColorClasses={getSeriesColorClasses} // Pass the helper function
                     setNewMessageOpen={setNewMessageOpen} // Pass setter to open dialog
+                    router={router} // Pass the router object down
                  />
              ) : (
                  // Placeholder for other tab content (Inspiration, Congregation, etc.)
@@ -389,7 +390,7 @@ export default function SermonJourney() {
           </main>
 
           {/* Right Sidebar */}
-          <RightSidebar />
+          {/* <RightSidebar /> */}
         </div>
       </div>
 

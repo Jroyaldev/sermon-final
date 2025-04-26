@@ -53,6 +53,7 @@ export default function HomePage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentQuote, setCurrentQuote] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showHeroContent, setShowHeroContent] = useState(true);
 
   // Update time every minute
   useEffect(() => {
@@ -70,6 +71,15 @@ export default function HomePage() {
     }, 8000);
     
     return () => clearInterval(quoteTimer);
+  }, []);
+
+  // Timer to hide hero content and show enhanced date/time after about 1 minute
+  useEffect(() => {
+    const heroTimer = setTimeout(() => {
+      setShowHeroContent(false);
+    }, 10000); // Speed up for testing
+    
+    return () => clearTimeout(heroTimer);
   }, []);
   
   // Format date and time
@@ -260,9 +270,9 @@ export default function HomePage() {
           
           {/* Right: Time, Account and Greeting with Ministerial Copy */}
           <div className="flex items-center gap-4 sm:gap-6">
-            <div className="hidden md:flex flex-col items-end">
+            <div className="hidden md:flex flex-col items-center">
               <span className="text-sm font-light italic text-foreground/70">{getGreeting()}</span>
-              <div className="flex items-center gap-2 text-muted-foreground/80">
+              <div className="flex items-center justify-center gap-2 text-muted-foreground/80">
                 <Clock className="w-3.5 h-3.5" />
                 <span className="text-xs font-light tracking-wide">{formattedTime}</span>
               </div>
@@ -358,112 +368,191 @@ export default function HomePage() {
             className="mb-20 md:mb-32 lg:mb-36 relative flex flex-col items-center text-center"
           >
             {/* Date/Time Display with premium serif typography */}
-            <motion.div 
-              className="mb-8 md:mb-10"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-            >
-              <div className="flex flex-col items-center md:items-baseline gap-1 md:gap-3">
-                <h2 className="text-lg sm:text-xl font-serif text-foreground/80 tracking-tight">
-                  {formattedDate}
-                </h2>
-                <div className="flex items-center gap-2 md:mt-0">
-                  <span className="inline-block w-1 h-1 rounded-full bg-foreground/30" />
-                  <span className="text-base font-light text-foreground/60 tracking-wide">
-                    {formattedTime}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
+            <AnimatePresence mode="wait">
+              {showHeroContent ? (
+                <>
+                  <motion.div 
+                    className="mb-8 md:mb-10"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                  >
+                    <div className="flex flex-col items-center gap-1 md:gap-3">
+                      <h2 className="text-lg sm:text-xl font-serif text-foreground/80 tracking-tight">
+                        {formattedDate}
+                      </h2>
+                      <div className="flex items-center justify-center gap-2 md:mt-0">
+                        <span className="inline-block w-1 h-1 rounded-full bg-foreground/30" />
+                        <span className="text-base font-light text-foreground/60 tracking-wide">
+                          {formattedTime}
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
 
-            {/* Premium hero content with improved ministerial typography */}
-            <div className="relative z-10 max-w-2xl">
-              {/* Small decorative accent */}
-              <motion.div 
-                className="w-16 h-0.5 bg-gradient-to-r from-accent-1/80 to-accent-1/40 rounded-full mb-6 mx-auto"
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: 64, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.8 }}
-              />
-              
-              {/* Enhanced heading with confident serif typography */}
-              <motion.h1 
-                className="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground leading-[1.05] tracking-tighter mb-4"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-              >
-                Ministry begins here.
-              </motion.h1>
-              
-              {/* Refined subtitle with better typography */}
-              <motion.p 
-                className="text-base sm:text-lg text-muted-foreground/90 mt-2 font-light leading-relaxed tracking-wide max-w-lg mx-auto"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-              > 
-                Tools to shepherd, teach, and lead—without the noise.
-              </motion.p>
-              
-              {/* Scripture quote that rotates */}
-              <motion.div
-                className="relative h-20 mt-8 overflow-hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                <AnimatePresence mode="wait">
+                  {/* Premium hero content with improved ministerial typography */}
+                  <motion.div 
+                    className="relative z-10 max-w-2xl"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0, y: 30 }}
+                    transition={{ duration: 1.8, ease: "easeInOut" }}
+                  >
+                    {/* Small decorative accent */}
+                    <motion.div 
+                      className="w-16 h-0.5 bg-gradient-to-r from-accent-1/80 to-accent-1/40 rounded-full mb-6 mx-auto"
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: 64, opacity: 1 }}
+                      transition={{ delay: 0.2, duration: 0.8 }}
+                    />
+                    
+                    {/* Enhanced heading with confident serif typography */}
+                    <motion.h1 
+                      className="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground leading-[1.05] tracking-tighter mb-4"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+                    >
+                      Ministry begins here.
+                    </motion.h1>
+                    
+                    {/* Refined subtitle with better typography */}
+                    <motion.p 
+                      className="text-base sm:text-lg text-muted-foreground/90 mt-2 font-light leading-relaxed tracking-wide max-w-lg mx-auto"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                    > 
+                      Tools to shepherd, teach, and lead—without the noise.
+                    </motion.p>
+                    
+                    {/* Scripture quote that rotates */}
+                    <motion.div
+                      className="relative h-20 mt-8 overflow-hidden"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.8, delay: 0.3 }}
+                    >
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={currentQuote}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.5 }}
+                          className="absolute inset-0 flex flex-col items-center justify-center"
+                        >
+                          <p className="text-sm italic text-foreground/70 max-w-md">
+                            "{scriptureQuotes[currentQuote].text}"
+                          </p>
+                          <p className="text-xs font-medium mt-1 text-accent-1">
+                            {scriptureQuotes[currentQuote].reference}
+                          </p>
+                        </motion.div>
+                      </AnimatePresence>
+                    </motion.div>
+                    
+                    {/* User greeting with refined styling */}
+                    {session?.user?.name && (
+                      <motion.p
+                        className="mt-8 text-xl font-light hidden md:block"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+                      >
+                        Hey <span className="font-serif font-medium text-accent-1">{session.user.name.split(' ')[0]}</span>, ready to serve?
+                      </motion.p>
+                    )}
+                    
+                    {/* Improved CTA with 3D tactile styling */}
+                    <motion.div 
+                      className="mt-10 md:mt-12"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 0.7, ease: "easeOut", delay: 0.4 }}
+                    >
+                      <motion.div 
+                        className="inline-flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-accent-3/40 to-accent-3/20 rounded-full border border-accent-3/40 shadow-sm hover:shadow-md tactile-button"
+                        whileHover={{ 
+                          scale: 1.03,
+                          transition: { duration: 0.2 }
+                        }}
+                      >
+                        <Sparkles className="w-4 h-4 text-accent-1/90" />
+                        <span className="text-sm font-medium tracking-wide text-foreground/90">Explore Your Ministry Tools</span>
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+                </>
+              ) : (
+                <motion.div 
+                  className="py-12 md:py-16 flex flex-col items-center justify-center"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+                >
                   <motion.div
-                    key={currentQuote}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute inset-0 flex flex-col items-center justify-center"
+                    transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
+                    className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-accent-3/30 to-accent-1/20 flex items-center justify-center mb-10 shadow-xl shadow-accent-1/5 border border-accent-1/10"
                   >
-                    <p className="text-sm italic text-foreground/70 max-w-md">
-                      "{scriptureQuotes[currentQuote].text}"
-                    </p>
-                    <p className="text-xs font-medium mt-1 text-accent-1">
-                      {scriptureQuotes[currentQuote].reference}
-                    </p>
+                    <Flame className="w-14 h-14 md:w-16 md:h-16 text-accent-1/80" />
                   </motion.div>
-                </AnimatePresence>
-              </motion.div>
-              
-              {/* User greeting with refined styling */}
-              {session?.user?.name && (
-                <motion.p
-                  className="mt-8 text-xl font-light hidden md:block"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-                >
-                  Hey <span className="font-serif font-medium text-accent-1">{session.user.name.split(' ')[0]}</span>, ready to serve?
-                </motion.p>
-              )}
-              
-              {/* Improved CTA with 3D tactile styling */}
-              <motion.div 
-                className="mt-10 md:mt-12"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.7, ease: "easeOut", delay: 0.4 }}
-              >
-                <motion.div 
-                  className="inline-flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-accent-3/40 to-accent-3/20 rounded-full border border-accent-3/40 shadow-sm hover:shadow-md tactile-button"
-                  whileHover={{ 
-                    scale: 1.03,
-                    transition: { duration: 0.2 }
-                  }}
-                >
-                  <Sparkles className="w-4 h-4 text-accent-1/90" />
-                  <span className="text-sm font-medium tracking-wide text-foreground/90">Explore Your Ministry Tools</span>
+                  
+                  <motion.h2 
+                    className="text-4xl md:text-6xl lg:text-7xl font-serif text-foreground tracking-tight mb-5 font-light"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+                  >
+                    {formattedDate}
+                  </motion.h2>
+                  
+                  <motion.div 
+                    className="flex items-center justify-center gap-4 mb-2"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1.5, delay: 0.7, ease: "easeOut" }}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-accent-1/40" />
+                    <span className="text-3xl md:text-5xl font-light text-foreground/80 tracking-wider">
+                      {formattedTime}
+                    </span>
+                    <div className="w-2 h-2 rounded-full bg-accent-1/40" />
+                  </motion.div>
+                  
+                  {session?.user?.name && (
+                    <motion.p
+                      className="mt-10 text-xl md:text-2xl font-light text-foreground/50"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 1.5, delay: 0.9, ease: "easeOut" }}
+                    >
+                      Peace be with you, <span className="font-serif italic text-accent-1/80">{session.user.name.split(' ')[0]}</span>
+                    </motion.p>
+                  )}
+
+                  <motion.div
+                    className="absolute inset-0 -z-10 overflow-hidden opacity-10 pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.15 }}
+                    transition={{ duration: 2, delay: 1 }}
+                  >
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gradient-radial from-accent-1/40 to-transparent blur-3xl" />
+                  </motion.div>
+                  
+                  <motion.div
+                    className="w-full max-w-md mt-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1.5, delay: 1.1 }}
+                  >
+                    <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-accent-1/20 to-transparent rounded-full" />
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            </div>
+              )}
+            </AnimatePresence>
           </motion.section>
 
           {/* Core Modules Section with Improved Card Design */}
