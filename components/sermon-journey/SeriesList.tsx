@@ -104,29 +104,29 @@ export function SeriesList({
                                 className="group"
                             >
                                 <Card className={cn(
-                                    "flex items-center justify-between p-3 gap-3 transition-all duration-300",
-                                    !s.active && "opacity-60 bg-muted/50", // Apply styles for inactive series
+                                    "flex items-center justify-between p-4 sm:p-5 gap-3 transition-all duration-300 border-b border-border/20 bg-white/90 dark:bg-[#23201c]/90",
+                                    !s.active && "opacity-60 bg-muted/50",
                                     s.active && "hover:shadow-md hover:border-accent-3/20 group-hover:bg-gradient-to-r group-hover:from-card/90 group-hover:to-card/70"
                                 )}>
-                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <div className="flex items-center gap-3 flex-1 min-w-0">
                                         <span className={cn(
-                                            "h-3 w-3 rounded-full block flex-shrink-0 border shadow-sm",
+                                            "h-3.5 w-3.5 rounded-full block flex-shrink-0 border shadow-sm",
                                             seriesColors.bg,
                                             seriesColors.border
                                         )}></span>
-                                        <span className="font-medium font-serif truncate" title={s.name}>{s.name}</span>
+                                        <span className="font-serif text-lg font-bold truncate" title={s.name}>{s.name}</span>
                                         <motion.span 
-                                            className="text-xs text-muted-foreground flex-shrink-0 bg-background/50 px-1.5 py-0.5 rounded-full"
+                                            className="text-xs text-muted-foreground flex-shrink-0 bg-background/60 px-2 py-0.5 rounded-full ml-2"
                                             whileHover={{ scale: 1.05 }}
                                         > 
                                             {sermonCount} {sermonCount === 1 ? 'sermon' : 'sermons'}
                                         </motion.span>
                                     </div>
-                                    <div className="flex items-center flex-shrink-0 gap-1">
+                                    <div className="flex items-center flex-shrink-0 gap-2">
                                         {!s.active && (
                                             <Badge 
                                                 variant="outline" 
-                                                className="text-xs h-fit bg-background/40 border-accent-3/20 font-light"
+                                                className="text-xs h-fit bg-background/40 border-accent-3/20 font-light px-2 py-0.5 rounded-full"
                                             >
                                                 Archived
                                             </Badge>
@@ -134,7 +134,7 @@ export function SeriesList({
                                         <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleToggleSeriesArchive(s._id, s.active)}
                                                 title={s.active ? "Archive Series" : "Unarchive Series"}
                                                 className="h-8 w-8 p-0 rounded-full hover:bg-accent-3/10 hover:text-accent-1"

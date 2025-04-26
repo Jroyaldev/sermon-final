@@ -40,11 +40,12 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 
 // Import newly created components
-import { SidebarNav } from "@/components/sermon-journey/SidebarNav";
+import { SidebarNav, navItems } from "@/components/sermon-journey/SidebarNav";
 import { JourneyHeader } from "@/components/sermon-journey/JourneyHeader";
 import { JourneyTabs } from "@/components/sermon-journey/JourneyTabs";
 // import { RightSidebar } from "@/components/sermon-journey/RightSidebar"; // Removed import
 import { NewSermonDialog } from "@/components/sermon-journey/NewSermonDialog";
+import { BottomNav } from "@/components/sermon-journey/BottomNav";
 
 // Assuming Sermon interface matches the one in api/sermons/route.ts
 // If not, define or import it here
@@ -350,7 +351,7 @@ export default function SermonJourney() {
   // Main component structure using imported components
   return (
     <div className="flex h-screen w-full bg-[#f9f8f6] dark:bg-[#1d1a17]">
-      {/* Sidebar Navigation */}
+      {/* Sidebar Navigation (Desktop) */}
       <SidebarNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -359,26 +360,24 @@ export default function SermonJourney() {
 
         <div className="flex flex-1 overflow-hidden">
           {/* Main Content Area with Tabs */}
-          <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+          <main className="flex-1 p-6 md:p-8 overflow-y-auto pb-24 md:pb-0"> {/* Add pb-24 for mobile BottomNav space */}
              {/* Conditionally render JourneyTabs or other content based on activeTab */}
              { (activeTab === "journey" || activeTab === "series") ? (
                  <JourneyTabs
                     activeTab={activeTab}
-                    setActiveTab={setActiveTab} // Pass setter to allow tabs to change parent state
+                    setActiveTab={setActiveTab}
                     sermons={sermons}
-                    seriesList={seriesList} // Pass all series for the "Series" tab
+                    seriesList={seriesList}
                     expandedSermon={expandedSermon}
                     toggleExpandSermon={toggleExpandSermon}
                     handleToggleSeriesArchive={handleToggleSeriesArchive}
-                    getSeriesColorClasses={getSeriesColorClasses} // Pass the helper function
-                    setNewMessageOpen={setNewMessageOpen} // Pass setter to open dialog
-                    router={router} // Pass the router object down
+                    getSeriesColorClasses={getSeriesColorClasses}
+                    setNewMessageOpen={setNewMessageOpen}
+                    router={router}
                  />
              ) : (
-                 // Placeholder for other tab content (Inspiration, Congregation, etc.)
                  <div className="mt-4">
                     <h2 className="text-2xl font-medium tracking-tight text-foreground mb-4">
-                      {/* Dynamically show title based on activeTab */}
                       { activeTab === "inspiration" && "Inspiration Garden" }
                       { activeTab === "congregation" && "Congregation Insights" }
                       { activeTab === "delivery" && "Delivery Preparation" }
@@ -399,8 +398,11 @@ export default function SermonJourney() {
         isOpen={newMessageOpen}
         setIsOpen={setNewMessageOpen}
         onSave={handleSaveSermon}
-        activeSeries={activeSeriesList} // Pass only active series for the dropdown
+        activeSeries={activeSeriesList}
       />
+
+      {/* Bottom Navigation (Mobile) */}
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }

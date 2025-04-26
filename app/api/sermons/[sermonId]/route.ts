@@ -52,14 +52,15 @@ interface SessionWithId {
 
 export async function GET(
     request: Request, 
-    { params }: { params: { sermonId: string } }
+    context: { params: { sermonId: string } }
 ) {
+    const { params } = context;
+    const { sermonId } = await params;
     const session: SessionWithId | null = await getServerSession(authOptions);
     if (!session?.user?.id) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const userId = session.user.id; // This should be a string from the session callback
-    const sermonId = params.sermonId;
 
     if (!ObjectId.isValid(sermonId)) {
          return NextResponse.json({ message: 'Invalid Sermon ID format' }, { status: 400 });
@@ -122,14 +123,15 @@ export async function GET(
 // --- PATCH Handler for Updates ---
 export async function PATCH(
     request: Request, 
-    { params }: { params: { sermonId: string } }
+    context: { params: { sermonId: string } }
 ) {
+    const { params } = context;
+    const { sermonId } = await params;
     const session: SessionWithId | null = await getServerSession(authOptions);
     if (!session?.user?.id) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const userId = session.user.id;
-    const sermonId = params.sermonId;
 
     if (!ObjectId.isValid(sermonId)) {
          return NextResponse.json({ message: 'Invalid Sermon ID format' }, { status: 400 });
@@ -138,12 +140,13 @@ export async function PATCH(
     try {
         // Parse the request body
         const updates = await request.json();
+        console.log('[PATCH_SERMON] Incoming updates:', JSON.stringify(updates, null, 2));
         // Valid fields that can be updated
         const validUpdateFields = [
             'title', 'scripture', 'notes', 'date', 'seriesId', 
             'inspiration', 'progress', 'keyPoints', 'scriptureText',
             'illustrations', 'practicalApplications', 'color', 
-            'borderColor', 'textColor', 'sections'
+            'borderColor', 'textColor', 'sections', 'blocks'
         ];
 
         // Filter out any fields not in the valid update fields list

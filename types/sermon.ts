@@ -20,6 +20,16 @@ export interface SermonSection {
   customType?: string; // Used when type is 'custom'
 }
 
+// Add Block interface
+export interface Block {
+  id: string;
+  type: string;
+  text?: string;
+  level?: number;
+  reference?: string;
+  items?: string[];
+}
+
 // Defines a Sermon, potentially populated with its series information
 export interface PopulatedSermon {
   _id: string;
@@ -38,6 +48,7 @@ export interface PopulatedSermon {
   textColor?: string;
   // Sermon content details using structured sections
   sections?: SermonSection[]; // Organized sections of the sermon
+  blocks?: Block[]; // Block-based content structure
   keyPoints?: string[];
   scriptureText?: string; // Full text of the scripture passage
   illustrations?: string[]; // Anecdotes, stories

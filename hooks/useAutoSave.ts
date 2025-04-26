@@ -2,29 +2,34 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import isEqual from 'lodash/isEqual';
 import { toast } from 'sonner';
+import { Block } from '@/types/sermon';
 
 // Define types
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-export interface AutoSaveOptions<T> {
-  data: T; // Current data
-  onSave: (data: T) => Promise<any>; // Save function
-  interval?: number; // Debounce interval in ms
-  onSuccess?: (response: any) => void; // Optional success callback
-  onError?: (error: Error) => void; // Optional error callback
-  enabled?: boolean; // Whether auto-save is enabled
+// Make ValueType generic to handle blocks properly
+export interface ValueType {
+  [key: string]: any;
+  blocks?: Block[]; // Optional blocks field
+}
+
+export interface AutoSaveOptions<T extends ValueType> {
+  initialValue: T;
+  onSave: (value: T) => Promise<any>;
+  interval?: number; // ms
+  debounce?: number; // ms
+  enabled?: boolean;
 }
 
 /**
  * Custom hook for handling auto-save functionality with dirty state tracking
  */
-export function useAutoSave<T extends Record<string, any>>({
-  data,
+export function useAutoSave<T extends ValueType>({
+  initialValue,
   onSave,
-  interval = 2500,
-  onSuccess,
-  onError,
-  enabled = true,
+  interval = 60000, // Default: 1 minute
+  debounce = 1000, // Default: 1 second
+  enabled = true
 }: AutoSaveOptions<T>) {
   // State for managing the save status
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
@@ -35,7 +40,8 @@ export function useAutoSave<T extends Record<string, any>>({
   
   // Set initial data when the hook first mounts or when explicitly reset
   const setInitialData = useCallback((data: T) => {
-    initialDataRef.current = JSON.parse(JSON.stringify(data)); // Deep clone
+    // Use a safer deep clone that handles undefined values
+    initialDataRef.current = data ? structuredClone(data) : null;
     setIsDirty(false);
     setSaveStatus('idle');
   }, []);
@@ -43,9 +49,9 @@ export function useAutoSave<T extends Record<string, any>>({
   // Set initial data on first render
   useEffect(() => {
     if (!initialDataRef.current) {
-      setInitialData(data);
+      setInitialData(initialValue);
     }
-  }, [data, setInitialData]);
+  }, [initialValue, setInitialData]);
   
   // Function to perform the save operation
   const performSave = useCallback(async () => {
@@ -54,17 +60,14 @@ export function useAutoSave<T extends Record<string, any>>({
     setSaveStatus('saving');
     
     try {
-      const response = await onSave(data);
+      const response = await onSave(initialValue);
       
       // Update reference data after successful save
-      setInitialData(data);
+      setInitialData(initialValue);
       setSaveStatus('saved');
       
       // Reset to idle after a delay
       setTimeout(() => setSaveStatus('idle'), 2000);
-      
-      // Call success callback if provided
-      if (onSuccess) onSuccess(response);
       
     } catch (error) {
       console.error("Auto-save error:", error);
@@ -72,11 +75,8 @@ export function useAutoSave<T extends Record<string, any>>({
       
       // Show error toast
       toast.error(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      
-      // Call error callback if provided
-      if (onError && error instanceof Error) onError(error);
     }
-  }, [data, isDirty, saveStatus, onSave, setInitialData, enabled, onSuccess, onError]);
+  }, [initialValue, isDirty, saveStatus, onSave, setInitialData, enabled]);
   
   // Create a debounced version of the save function
   const debouncedSave = useDebouncedCallback(performSave, interval);
@@ -86,7 +86,7 @@ export function useAutoSave<T extends Record<string, any>>({
     if (!initialDataRef.current) return;
     
     // Compare current data with reference data
-    const isDataChanged = !isEqual(data, initialDataRef.current);
+    const isDataChanged = !isEqual(initialValue, initialDataRef.current);
     
     if (isDataChanged) {
       setIsDirty(true);
@@ -95,7 +95,7 @@ export function useAutoSave<T extends Record<string, any>>({
     } else {
       setIsDirty(false);
     }
-  }, [data, saveStatus]);
+  }, [initialValue, saveStatus]);
   
   // Trigger auto-save when dirty
   useEffect(() => {

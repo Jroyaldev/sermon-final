@@ -16,7 +16,7 @@ interface SidebarNavProps {
     setActiveTab: (tabId: string) => void;
 }
 
-const navItems = [
+export const navItems = [
     { id: "journey", icon: <BookOpen className="h-5 w-5" />, label: "Journey" },
     { id: "inspiration", icon: <Lightbulb className="h-5 w-5" />, label: "Inspiration" },
     { id: "congregation", icon: <Users className="h-5 w-5" />, label: "Congregation" },

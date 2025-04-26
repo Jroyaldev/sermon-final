@@ -121,17 +121,17 @@ export function JourneyList({
                             >
                                 <CardHeader
                                     className={cn(
-                                        "flex flex-row items-start justify-between p-4 cursor-pointer gap-4",
+                                        "flex flex-row items-start justify-between p-5 sm:p-6 cursor-pointer gap-4 border-b border-border/20 bg-white/90 dark:bg-[#23201c]/90",
                                     )}
                                     onClick={() => toggleExpandSermon(sermon._id)}
                                 >
-                                    <div className="flex-1 space-y-1.5 min-w-0">
+                                    <div className="flex-1 space-y-2 min-w-0">
                                         {/* Only render badge if series is an object with name property */}
                                         {seriesObject && 'name' in seriesObject && (
                                             <Badge
                                                 variant="outline"
                                                 className={cn(
-                                                    "w-fit text-xs uppercase tracking-wider border font-medium",
+                                                    "w-fit text-xs uppercase tracking-wider border font-medium mb-1 px-2 py-0.5 rounded-full",
                                                     seriesColors.bg,
                                                     seriesColors.border,
                                                     seriesColors.text
@@ -141,20 +141,20 @@ export function JourneyList({
                                             </Badge>
                                         )}
 
-                                        <CardTitle className="text-md font-serif font-semibold leading-tight pt-0.5 truncate" title={sermon.title}>
+                                        <CardTitle className="text-lg sm:text-xl font-serif font-bold leading-tight pt-0.5 truncate" title={sermon.title}>
                                             {sermon.title}
                                         </CardTitle>
-                                        <div className="text-xs text-muted-foreground flex items-center flex-wrap gap-x-2 gap-y-1 pt-1">
+                                        <div className="text-xs text-muted-foreground flex items-center flex-wrap gap-x-3 gap-y-1 pt-1">
                                             {sermon.date && (
                                                 <div className="flex items-center gap-1">
-                                                    <Calendar className="h-3 w-3" />
+                                                    <Calendar className="h-3.5 w-3.5" />
                                                     <span>{new Date(sermon.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                                 </div>
                                             )}
                                             {sermon.date && sermon.scripture && <span className="hidden sm:inline text-accent-1/30">&bull;</span>}
                                             {sermon.scripture && (
                                                 <div className="flex items-center gap-1">
-                                                    <BookOpen className="h-3 w-3" />
+                                                    <BookOpen className="h-3.5 w-3.5" />
                                                     <span className="truncate" title={sermon.scripture}>{sermon.scripture}</span>
                                                 </div>
                                             )}
@@ -166,7 +166,7 @@ export function JourneyList({
                                         <Button 
                                             variant="ghost" 
                                             size="icon" 
-                                            className="h-7 w-7 rounded-full hover:bg-accent-3/10"
+                                            className="h-8 w-8 rounded-full hover:bg-accent-3/10"
                                             onClick={(e) => { 
                                                 e.stopPropagation(); 
                                                 // Navigate to the edit page for this sermon
@@ -197,8 +197,8 @@ export function JourneyList({
                                             transition={{ duration: 0.3, ease: "easeInOut" }}
                                             className="overflow-hidden"
                                         >
-                                            <CardContent className="p-5 pt-2 border-t bg-gradient-to-br from-background/50 to-background/30">
-                                                <h4 className="text-sm font-medium mb-2 font-serif text-foreground/90">Notes</h4>
+                                            <CardContent className="p-6 border-t bg-gradient-to-br from-background/60 to-background/30">
+                                                <h4 className="text-base font-serif font-semibold mb-2 text-foreground/90">Notes</h4>
                                                 <p className="text-sm text-muted-foreground whitespace-pre-wrap font-light leading-relaxed">
                                                     {sermon.notes || 'No notes yet. Add your sermon thoughts here.'}
                                                 </p>
