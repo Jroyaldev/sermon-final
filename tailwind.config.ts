@@ -53,6 +53,26 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'card-bg-featured': '#F4D8CD', // Muted Terracotta/Peach
+        'card-bg-next': '#D5E8D6',     // Muted Sage Green
+        'card-bg-soon-1': '#EDE4D4',  // Warm Beige/Sand
+        'card-bg-soon-2': '#DEE7F0',   // Cool Muted Grey
+        'card-bg-active': 'hsl(var(--card))',
+        'card-fg-on-featured': '#4D3B32', // Dark Brown
+        'card-fg-on-next': '#2C402D',     // Dark Green
+        'card-fg-on-soon-1': '#4F4639',   // Dark Brown
+        'card-fg-on-soon-2': '#303A42',   // Dark Blue/Grey
+        'card-fg-active': 'hsl(var(--card-foreground))',
+        'dark-card-bg-featured': '#4D3B32',
+        'dark-card-bg-next': '#2C402D',
+        'dark-card-bg-soon-1': '#4F4639',
+        'dark-card-bg-soon-2': '#303A42',
+        'dark-card-bg-active': 'hsl(var(--card))',
+        'dark-card-fg-on-featured': '#F4D8CD',
+        'dark-card-fg-on-next': '#D5E8D6',
+        'dark-card-fg-on-soon-1': '#EDE4D4',
+        'dark-card-fg-on-soon-2': '#DEE7F0',
+        'dark-card-fg-active': 'hsl(var(--card-foreground))',
       },
       borderRadius: {
         lg: "var(--radius)",
